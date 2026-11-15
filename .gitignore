@@ -1,0 +1,15 @@
+# Operating System Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Node / Scratch files
+node_modules/
+*.log
+*.tmp
+*_backup.js
+
+# IDE / Editor Files
+.vscode/
+.idea/
+*.swp

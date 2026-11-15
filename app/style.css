@@ -1,0 +1,163 @@
+/* ==========================================================================
+   Android 17 "Liquid Glass" (Material Expressive + Glassmorphism) Design System
+   ========================================================================== */
+
+:root {
+  --glass-bg: rgba(15, 23, 42, 0.52);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-border-glow: rgba(52, 211, 153, 0.35);
+  --glass-specular: rgba(255, 255, 255, 0.18);
+  --glass-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.75), 0 0 25px rgba(16, 185, 129, 0.08);
+}
+
+/* Ambient Floating Mesh Orbs (Android 17 Live Atmosphere) */
+.ambient-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.ambient-orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(80px);
+  opacity: 0.45;
+  will-change: transform;
+  animation: floatOrb 22s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+}
+
+.ambient-orb-1 {
+  width: 320px;
+  height: 320px;
+  top: -80px;
+  left: -60px;
+  background: radial-gradient(circle, #059669 0%, #0d9488 45%, transparent 70%);
+  animation-duration: 20s;
+}
+
+.ambient-orb-2 {
+  width: 360px;
+  height: 360px;
+  bottom: 80px;
+  right: -90px;
+  background: radial-gradient(circle, #0284c7 0%, #0369a1 45%, transparent 70%);
+  animation-duration: 25s;
+  animation-delay: -5s;
+}
+
+.ambient-orb-3 {
+  width: 280px;
+  height: 280px;
+  top: 42%;
+  left: 25%;
+  background: radial-gradient(circle, #d97706 0%, #b45309 35%, transparent 70%);
+  opacity: 0.25;
+  animation-duration: 28s;
+  animation-delay: -10s;
+}
+
+@keyframes floatOrb {
+  0% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+  50% {
+    transform: translate(45px, 60px) scale(1.15) rotate(90deg);
+  }
+  100% {
+    transform: translate(-30px, 35px) scale(0.9) rotate(180deg);
+  }
+}
+
+/* Glass Card & Surface Elements */
+.glass-panel {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.62) 0%, rgba(15, 23, 42, 0.52) 100%);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow), inset 0 1px 1px 0 var(--glass-specular);
+  border-radius: 28px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.glass-panel:hover {
+  border-color: rgba(52, 211, 153, 0.3);
+  box-shadow: 0 24px 45px -10px rgba(0, 0, 0, 0.85), 0 0 30px rgba(16, 185, 129, 0.15);
+}
+
+/* Glass Sheen (Specular Highlight across top edge) */
+.glass-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, transparent 100%);
+  pointer-events: none;
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
+}
+
+/* Pill Widgets (Android 17 Capsule Buttons) */
+.glass-capsule {
+  background: rgba(30, 41, 59, 0.55);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 8px 18px -4px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+  border-radius: 9999px;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.glass-capsule:active {
+  transform: scale(0.96);
+}
+
+/* Pulse Glow Keyframes */
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgba(16, 185, 129, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+.pulse-active {
+  animation: pulse-ring 2s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 20s linear infinite;
+}
+
+/* Custom Sleek Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.3);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(51, 65, 85, 0.6);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(16, 185, 129, 0.7);
+}
+
+.font-hindi {
+  font-family: 'Hind', sans-serif;
+}

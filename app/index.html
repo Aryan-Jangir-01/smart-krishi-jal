@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Smart Krishi-Jal 3.0 | Android 17 Liquid Glass Edition</title>
+  
+  <!-- Tailwind CSS, Lucide Icons, Chart.js -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Hind:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#030712">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen pb-32 font-['Plus_Jakarta_Sans',sans-serif] selection:bg-emerald-500 selection:text-white relative overflow-x-hidden">
+
+  <!-- Ambient Floating Mesh Orbs (Android 17 Live Atmosphere Background) -->
+  <div class="ambient-container">
+    <div class="ambient-orb ambient-orb-1"></div>
+    <div class="ambient-orb ambient-orb-2"></div>
+    <div class="ambient-orb ambient-orb-3"></div>
+  </div>
+
+  <!-- FLOATING ANDROID 17 DYNAMIC ISLAND TOP BAR -->
+  <header class="sticky top-2 z-50 max-w-md mx-auto px-2.5">
+    <div class="glass-capsule px-4 py-2.5 flex items-center justify-between border border-white/15 bg-slate-900/60 shadow-2xl backdrop-blur-3xl">
+      <!-- App Brand & Logo -->
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-2xl bg-gradient-to-tr from-emerald-500 via-teal-400 to-cyan-300 flex items-center justify-center shadow-lg shadow-emerald-500/30">
+          <i data-lucide="sprout" class="w-5 h-5 text-slate-950 stroke-[2.5]"></i>
+        </div>
+        <div>
+          <h1 id="appHeaderTitle" class="font-bold text-sm leading-tight text-white flex items-center gap-1.5">
+            स्मार्ट कृषि-जल <span class="text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-400/20 text-emerald-300 border border-emerald-400/40 font-mono font-bold">17.0</span>
+          </h1>
+          <p id="appHeaderSubtitle" class="text-[10px] text-slate-400 font-hindi">प्रेसिजन एआई सिंचाई</p>
+        </div>
+      </div>
+
+      <!-- Quick Action Capsules -->
+      <div class="flex items-center gap-1.5">
+        <!-- Power Grid Capsule -->
+        <button id="gridPowerPill" title="खेत में ग्रिड बिजली स्थिति (क्लिक कर टॉगल करें)" class="glass-capsule flex items-center gap-1 px-2.5 py-1 text-[11px] text-emerald-300 bg-emerald-500/15 border border-emerald-400/30 cursor-pointer">
+          <i data-lucide="zap" class="w-3.5 h-3.5 fill-emerald-400"></i>
+          <span id="gridPowerText" class="hidden sm:inline font-semibold">बिजली चालू</span>
+        </button>
+
+        <!-- Multi-Language Capsule -->
+        <button id="langToggleBtn" class="glass-capsule flex items-center gap-1.5 px-2.5 py-1 text-slate-200 text-xs font-semibold hover:border-emerald-400/40 cursor-pointer transition-all">
+          <i data-lucide="globe" class="w-3.5 h-3.5 text-emerald-400"></i>
+          <span id="langLabel">हिन्दी</span>
+          <i data-lucide="chevron-down" class="w-3 h-3 text-slate-400"></i>
+        </button>
+
+        <!-- Voice Capsule -->
+        <button id="voiceToggleBtn" title="Kisan-Vani Voice" class="glass-capsule p-1.5 text-emerald-400 hover:text-white hover:bg-emerald-500/20 cursor-pointer">
+          <i data-lucide="volume-2" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN SCROLLABLE APP BODY -->
+  <main class="max-w-md mx-auto px-3.5 pt-3 space-y-3.5 relative z-10">
+
+    <!-- DRY-RUN ALARM BANNER (Frosted Red Warning Glass) -->
+    <div id="dryRunAlarmBanner" class="hidden glass-panel border-red-500/60 bg-gradient-to-r from-red-950/80 via-red-900/60 to-red-950/80 p-3.5 shadow-2xl animate-pulse">
+      <div class="flex items-start justify-between">
+        <div class="flex items-start gap-2.5">
+          <div class="w-8 h-8 rounded-2xl bg-red-500/20 border border-red-500/40 flex items-center justify-center shrink-0">
+            <i data-lucide="alert-octagon" class="w-5 h-5 text-red-400"></i>
+          </div>
+          <div>
+            <h3 id="dryRunTitle" class="text-xs font-extrabold text-white uppercase tracking-wider">ड्राई-रन अलार्म: मोटर स्वतः बंद!</h3>
+            <p id="dryRunDesc" class="text-xs text-red-200/90 mt-0.5 font-hindi leading-relaxed">पंप चालू था लेकिन पाइप में पानी नहीं आ रहा। मोटर जलने से बचाने के लिए सुरक्षित बंद की गई।</p>
+          </div>
+        </div>
+        <button id="resetAlarmsBtn" class="glass-capsule px-3 py-1.5 bg-red-600/40 hover:bg-red-600 text-white text-[10px] font-bold uppercase shrink-0 border border-red-400/50">रीसेट</button>
+      </div>
+    </div>
+
+    <!-- DIGITAL TWIN: 2D Field Cross-Section in Frosted Liquid Glass Frame -->
+    <section class="glass-panel p-4">
+      <div class="flex items-center justify-between mb-2.5">
+        <span id="twinTitleLabel" class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+          <i data-lucide="activity" class="w-4 h-4"></i> डिजिटल ट्विन (Live Field Twin)
+        </span>
+        <span id="twinStatusTag" class="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-white/5 text-slate-300 border border-white/10">
+          खेत ज़ोन: 1 (मुख्य खंड)
+        </span>
+      </div>
+
+      <!-- Canvas for Soil & Water Animation with Glass Inset -->
+      <div class="relative w-full h-44 rounded-[22px] overflow-hidden border border-white/10 bg-gradient-to-b from-sky-950/90 via-slate-900/95 to-amber-950/80 shadow-inner">
+        <canvas id="fieldTwinCanvas" class="w-full h-full block"></canvas>
+        
+        <!-- Live Floating Translucent Capsules on Twin -->
+        <div class="absolute top-2 left-2 glass-capsule flex items-center gap-2 px-2.5 py-1 text-[11px] bg-slate-950/50">
+          <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+          <span><span id="rootMoistureLabel">जड़ नमी</span>: <strong id="rootMoistureText" class="text-emerald-400 font-bold">52%</strong></span>
+        </div>
+        <div class="absolute top-2 right-2 glass-capsule flex items-center gap-1.5 px-2.5 py-1 text-[11px] bg-slate-950/50">
+          <i data-lucide="gauge" class="w-3.5 h-3.5 text-cyan-400"></i>
+          <span><span id="flowRateLabel">प्रवाह</span>: <strong id="waterFlowText" class="text-white font-mono">0.0 L/min</strong></span>
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center text-[11px] text-slate-400 mt-2.5 px-1 font-hindi">
+        <span><span id="topsoilLabel">सतह</span>: <strong id="topsoilStatus" class="text-slate-200">नम (Moist)</strong></span>
+        <span><span id="rootDepthLabel">जड़ गहराई</span>: <strong class="text-slate-200">18-25 cm</strong></span>
+        <span><span id="saturationLabel">जल स्तर</span>: <strong id="saturationLevelText" class="text-emerald-400 font-bold">मध्यम</strong></span>
+      </div>
+    </section>
+
+    <!-- ACTION TILES: Leaf Doctor Scanner & WhatsApp Report (Glossy Android Tiles) -->
+    <section class="grid grid-cols-2 gap-2.5">
+      <!-- AI Leaf Doctor Button -->
+      <button id="openLeafDoctorBtn" class="glass-panel p-3.5 flex items-center gap-3 text-left group cursor-pointer hover:border-emerald-400/50">
+        <div class="w-10 h-10 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition shadow-inner">
+          <i data-lucide="scan-line" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h3 id="leafDoctorBtnTitle" class="text-xs font-bold text-white leading-tight">पत्ती रोग स्कैनर</h3>
+          <p id="leafDoctorBtnSub" class="text-[10px] text-slate-400 mt-0.5">कैमरा से रोग पहचानें</p>
+        </div>
+      </button>
+
+      <!-- WhatsApp Share Report Button -->
+      <button id="shareWhatsAppBtn" class="glass-panel p-3.5 flex items-center gap-3 text-left group cursor-pointer hover:border-green-400/50">
+        <div class="w-10 h-10 rounded-2xl bg-green-500/15 border border-green-500/30 text-green-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition shadow-inner">
+          <i data-lucide="share-2" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h3 id="whatsappReportTitle" class="text-xs font-bold text-white leading-tight">व्हाट्सएप रिपोर्ट</h3>
+          <p id="whatsappReportSub" class="text-[10px] text-slate-400 mt-0.5">खेत विवरण साझा करें</p>
+        </div>
+      </button>
+    </section>
+
+    <!-- LIVE MANDI BHAV (Agmarknet Live APMC Rates Glass Tile) -->
+    <section class="glass-panel p-3.5">
+      <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center gap-1.5 text-xs font-bold text-amber-300">
+          <div class="w-6 h-6 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400">
+            <i data-lucide="trending-up" class="w-3.5 h-3.5"></i>
+          </div>
+          <span id="mandiBhavHeading">आज का लाइव मंडी भाव (APMC Rates)</span>
+        </div>
+        <span class="text-[10px] text-slate-400 font-mono px-2 py-0.5 rounded-full bg-white/5 border border-white/5">Agmarknet Live</span>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2 text-center">
+        <div class="p-2 rounded-2xl bg-slate-900/60 border border-white/5 shadow-inner">
+          <span id="mandiNameLabel" class="text-[10px] text-slate-400 block truncate">जयपुर मंडी</span>
+          <strong id="mandiPriceVal" class="text-sm font-extrabold text-amber-300">₹2,440</strong>
+          <span class="text-[9px] text-emerald-400 block font-semibold">▲ +₹35/क्विंटल</span>
+        </div>
+        <div class="p-2 rounded-2xl bg-slate-900/60 border border-white/5 shadow-inner">
+          <span id="mandiMinMaxLabel" class="text-[10px] text-slate-400 block">न्यूनतम - अधिकतम</span>
+          <strong id="mandiMinMaxVal" class="text-xs font-bold text-slate-200">₹2,320 - ₹2,510</strong>
+          <span class="text-[9px] text-slate-400 block">रेंज (Range)</span>
+        </div>
+        <div class="p-2 rounded-2xl bg-slate-900/60 border border-white/5 shadow-inner">
+          <span id="mandiArrivalLabel" class="text-[10px] text-slate-400 block">दैनिक आवक</span>
+          <strong id="mandiArrivalVal" class="text-xs font-bold text-emerald-400">1,850 बोरी</strong>
+          <span class="text-[9px] text-slate-400 block">स्थिर (Stable)</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- AI Evapotranspiration (ET₀) & Optimal Irrigation Time Card -->
+    <section class="glass-panel p-3.5 bg-gradient-to-r from-amber-950/30 via-slate-900/50 to-emerald-950/30 border-amber-500/20">
+      <div class="flex items-start gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center shrink-0 shadow-lg shadow-amber-900/20">
+          <i data-lucide="sun-medium" class="w-6 h-6"></i>
+        </div>
+        <div class="flex-1">
+          <div class="flex items-center justify-between">
+            <h3 id="aiAdvisoryTitle" class="text-xs font-bold text-amber-300 flex items-center gap-1">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> एआई सिंचाई समय निर्धारक (AI Advisory)
+            </h3>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono font-bold border border-amber-500/30">ET₀: 4.2 mm/d</span>
+          </div>
+          <p id="optimalTimeAdvice" class="text-xs text-slate-200/90 mt-1.5 font-hindi leading-relaxed">
+            <strong>सिंचाई का सबसे उत्तम समय:</strong> <span class="text-emerald-400 font-bold">आज शाम 05:45 बजे</span>। दोपहर में तेज धूप के कारण 38% पानी वाष्प बनकर उड़ जाता है।
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Disease / Pest Early Warning Banner -->
+    <section id="diseaseWarningCard" class="hidden glass-panel border-red-500/40 bg-red-950/40 p-3.5 shadow-xl">
+      <div class="flex items-start gap-3">
+        <div class="w-9 h-9 rounded-2xl bg-red-500/20 border border-red-500/30 text-red-400 flex items-center justify-center shrink-0">
+          <i data-lucide="shield-alert" class="w-5 h-5"></i>
+        </div>
+        <div class="flex-1">
+          <div class="flex items-center justify-between">
+            <h3 id="diseaseRiskHeading" class="text-xs font-bold text-red-400 flex items-center gap-1">
+              रोग पूर्व-चेतावनी अलर्ट (Disease Risk Alert)
+            </h3>
+            <span id="diseaseRiskBadge" class="text-[10px] px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 font-bold border border-red-500/30">उच्च जोखिम</span>
+          </div>
+          <p id="diseaseWarningDesc" class="text-xs text-red-200/90 mt-1 font-hindi leading-relaxed">
+            वर्तमान तापमान व 75%+ आर्द्रता के कारण फसल में फंगल संक्रमण का खतरा है।
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Weather & Rain Forecast Card -->
+    <section id="weatherCard" class="glass-panel p-4 bg-gradient-to-br from-slate-900/60 via-slate-900/50 to-blue-950/40 border-blue-500/20">
+      <div class="flex items-start justify-between">
+        <div>
+          <span id="weatherForecastHeading" class="text-xs font-semibold uppercase tracking-wider text-cyan-400 flex items-center gap-1">
+            <i data-lucide="cloud-sun" class="w-4 h-4"></i> आज का मौसम व वर्षा पूर्वानुमान
+          </span>
+          <div class="flex items-baseline gap-2 mt-1">
+            <span id="weatherTemp" class="text-3xl font-extrabold text-white tracking-tight">28°C</span>
+            <span id="weatherCondition" class="text-sm font-medium text-slate-300 font-hindi">धूप खिली है (Clear Sky)</span>
+          </div>
+          <div class="flex items-center gap-3 mt-2 text-xs text-slate-400 font-hindi">
+            <span class="flex items-center gap-1"><i data-lucide="droplets" class="w-3.5 h-3.5 text-cyan-400"></i> <span id="rainProbLabel">बारिश संभावना</span>: <strong id="rainProb" class="text-slate-200">12%</strong></span>
+            <span class="flex items-center gap-1"><i data-lucide="wind" class="w-3.5 h-3.5 text-slate-400"></i> <span id="windSpeedLabel">हवा</span>: <strong id="windSpeed" class="text-slate-200">11 km/h</strong></span>
+          </div>
+        </div>
+        <div id="weatherIconBox" class="p-3 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 shadow-inner">
+          <i data-lucide="sun" class="w-8 h-8 text-amber-400 animate-spin-slow"></i>
+        </div>
+      </div>
+
+      <!-- Rain Advisory Text in Frosted Sub-card -->
+      <div id="weatherAdvisory" class="mt-3 p-2.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-start gap-2.5">
+        <i data-lucide="info" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+        <p id="weatherAdvisoryText" class="text-xs text-emerald-200/90 leading-relaxed font-hindi">
+          <strong>सिंचाई सलाह:</strong> बारिश की संभावना कम है। मिट्टी की नमी के अनुसार मोटर स्वतः चलेगी।
+        </p>
+      </div>
+    </section>
+
+    <!-- Active Crop Status & Sowing Age Tracker -->
+    <section class="glass-panel p-4">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center">
+            <i data-lucide="wheat" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h2 class="text-sm font-bold text-white flex items-center gap-1.5">
+              <span id="activeCropPrefix">सक्रिय फसल:</span> <span id="activeCropTitle" class="text-emerald-400">गेहूँ (Wheat)</span>
+            </h2>
+            <p id="sowingDateLabel" class="text-xs text-slate-400 font-hindi">बुवाई: 15 Oct 2026</p>
+          </div>
+        </div>
+        <button id="changeCropBtn" class="glass-capsule text-xs font-semibold px-3 py-1.5 text-emerald-300 hover:text-white hover:bg-emerald-500/30 flex items-center gap-1 cursor-pointer">
+          <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> <span id="changeCropBtnText">बदलें</span>
+        </button>
+      </div>
+
+      <!-- Progress / Days Elapsed -->
+      <div class="space-y-1.5 bg-slate-900/60 p-3 rounded-2xl border border-white/5 shadow-inner">
+        <div class="flex justify-between items-center text-xs">
+          <span id="cropAgeTitle" class="text-slate-400 font-medium">फसल की उम्र (Crop Age):</span>
+          <span id="cropAgeBadge" class="font-bold text-emerald-300 bg-emerald-500/15 px-2.5 py-0.5 rounded-full border border-emerald-500/30">
+            दिन 42 / 135
+          </span>
+        </div>
+        <div class="w-full bg-slate-800/80 rounded-full h-2.5 overflow-hidden p-0.5 shadow-inner">
+          <div id="cropProgressBar" class="bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-300 h-1.5 rounded-full transition-all duration-700" style="width: 31%;"></div>
+        </div>
+        <div class="flex justify-between items-center text-[11px] text-slate-400 pt-1 font-hindi">
+          <span><span id="currentStagePrefix">वर्तमान अवस्था:</span> <strong id="currentStageName" class="text-white">कल्ले फूटना व बढ़वार</strong></span>
+          <span id="waterNeedPill" class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/30">मध्यम आवश्यकता</span>
+        </div>
+      </div>
+
+      <!-- Stage Specific Farmer Advice -->
+      <div id="stageAdviceBox" class="mt-2.5 text-xs text-slate-300 bg-slate-900/40 p-2.5 rounded-2xl border border-white/5 flex items-start gap-2">
+        <i data-lucide="lightbulb" class="w-4 h-4 text-amber-400 shrink-0 mt-0.5"></i>
+        <p id="stageAdviceText" class="font-hindi text-slate-300/90 leading-relaxed">
+          कल्ले मजबूत हो रहे हैं। मिट्टी में 40% से नीचे नमी जाने पर ही हल्की सिंचाई करें।
+        </p>
+      </div>
+    </section>
+
+    <!-- Live Telemetry: Soil Moisture & Environmental Gauges (Glass Widgets) -->
+    <section class="grid grid-cols-2 gap-3">
+      
+      <!-- Soil Moisture Radial Gauge Glass Card -->
+      <div class="col-span-2 glass-panel p-4 flex flex-col items-center relative overflow-hidden">
+        <div class="w-full flex items-center justify-between mb-1">
+          <span id="soilMoistureHeading" class="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+            <i data-lucide="waves" class="w-4 h-4 text-emerald-400"></i> मिट्टी की नमी (Soil Moisture)
+          </span>
+          <span id="moistureStatusBadge" class="text-[11px] px-2.5 py-0.5 rounded-full font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+            सामान्य (Optimal)
+          </span>
+        </div>
+
+        <!-- Radial Gauge with Ambient Glow -->
+        <div class="relative w-44 h-44 flex items-center justify-center my-2">
+          <svg class="w-full h-full transform -rotate-90 drop-shadow-[0_0_15px_rgba(16,185,129,0.25)]" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="42" stroke="currentColor" stroke-width="8" class="text-slate-800/80 fill-none"/>
+            <circle id="moistureCircle" cx="50" cy="50" r="42" stroke="currentColor" stroke-width="8" stroke-dasharray="264" stroke-dashoffset="130" stroke-linecap="round" class="text-emerald-400 fill-none transition-all duration-1000 ease-out"/>
+          </svg>
+          <div class="absolute flex flex-col items-center justify-center text-center">
+            <span id="moisturePercentVal" class="text-4xl font-extrabold text-white tracking-tight">52%</span>
+            <span id="currentMoistureSub" class="text-[11px] text-slate-400 font-hindi">वर्तमान नमी</span>
+          </div>
+        </div>
+
+        <!-- Target Window Indicator -->
+        <div class="w-full grid grid-cols-2 gap-2 text-center text-xs mt-1 bg-slate-900/50 p-2 rounded-2xl border border-white/5 font-hindi">
+          <div>
+            <span id="motorOnThresholdLabel" class="text-slate-400 block text-[10px]">मोटर ऑन सीमा (Min)</span>
+            <strong id="minThreshDisplay" class="text-amber-400 font-bold">&lt; 40%</strong>
+          </div>
+          <div>
+            <span id="motorOffThresholdLabel" class="text-slate-400 block text-[10px]">मोटर ऑफ सीमा (Max)</span>
+            <strong id="maxThreshDisplay" class="text-cyan-400 font-bold">&gt; 70%</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Temperature Glass Card -->
+      <div class="glass-panel p-3.5 flex items-center gap-3">
+        <div class="w-11 h-11 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0 shadow-inner">
+          <i data-lucide="thermometer" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <span id="tempHeadingLabel" class="text-[11px] font-medium text-slate-400 block">तापमान (Temp)</span>
+          <span id="tempVal" class="text-2xl font-bold text-white tracking-tight">27.4°C</span>
+        </div>
+      </div>
+
+      <!-- Humidity Glass Card -->
+      <div class="glass-panel p-3.5 flex items-center gap-3">
+        <div class="w-11 h-11 rounded-2xl bg-teal-500/15 border border-teal-500/30 flex items-center justify-center text-teal-400 shrink-0 shadow-inner">
+          <i data-lucide="droplet" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <span id="humidityHeadingLabel" class="text-[11px] font-medium text-slate-400 block">आर्द्रता (Humidity)</span>
+          <span id="humidityVal" class="text-2xl font-bold text-white tracking-tight">62%</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Motor Control Center (12V DC Pump & Timed Burst) -->
+    <section class="glass-panel p-4 space-y-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div id="motorPulseIndicator" class="w-3.5 h-3.5 rounded-full bg-slate-600 transition-all"></div>
+          <h2 id="motorHeadingLabel" class="text-sm font-bold text-white">12V वाटर मोटर कंट्रोल</h2>
+        </div>
+        <!-- Mode Switch (Auto / Manual Capsules) -->
+        <div class="flex items-center bg-slate-900/80 p-1 rounded-full border border-white/10 text-xs">
+          <button id="modeAutoBtn" class="px-3 py-1 rounded-full font-bold transition bg-emerald-500 text-slate-950 shadow-md">
+            ऑटो (Auto)
+          </button>
+          <button id="modeManualBtn" class="px-3 py-1 rounded-full font-medium text-slate-400 hover:text-white transition">
+            मैनुअल (Manual)
+          </button>
+        </div>
+      </div>
+
+      <!-- Motor Visual Status Box -->
+      <div id="motorStatusBox" class="p-3.5 rounded-2xl bg-slate-900/60 border border-white/10 flex items-center justify-between transition-all duration-300 shadow-inner">
+        <div class="flex items-center gap-3">
+          <div id="pumpIconContainer" class="w-12 h-12 rounded-2xl bg-slate-800/80 border border-white/5 text-slate-400 flex items-center justify-center transition-all shadow-inner">
+            <i data-lucide="power" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span id="motorStateText" class="text-sm font-extrabold text-slate-300">मोटर बंद है (OFF)</span>
+            </div>
+            <p id="motorSubtext" class="text-[11px] text-slate-400 font-hindi">ऑटो-पायलट सक्रिय (नमी 40% से कम होने पर चलेगी)</p>
+          </div>
+        </div>
+
+        <!-- Manual ON/OFF Toggle Button -->
+        <button id="motorToggleBtn" disabled class="glass-capsule px-4 py-2.5 font-bold text-xs uppercase tracking-wide bg-slate-800 text-slate-500 cursor-not-allowed border-slate-700 shadow-lg">
+          चालू करें
+        </button>
+      </div>
+
+      <!-- Quick Timed Burst Buttons (10m, 20m, 30m) -->
+      <div class="flex items-center justify-between pt-1 border-t border-white/10 text-xs font-hindi">
+        <span id="timedBurstLabel" class="text-slate-400 text-[11px] flex items-center gap-1">
+          <i data-lucide="timer" class="w-3.5 h-3.5 text-emerald-400"></i> टाइमर से चलाएं:
+        </span>
+        <div class="flex gap-1.5">
+          <button data-burst="10" class="burstTimerBtn glass-capsule px-3 py-1 text-slate-300 text-[11px] hover:text-white hover:border-emerald-400/40 cursor-pointer">10 Min</button>
+          <button data-burst="20" class="burstTimerBtn glass-capsule px-3 py-1 text-slate-300 text-[11px] hover:text-white hover:border-emerald-400/40 cursor-pointer">20 Min</button>
+          <button data-burst="30" class="burstTimerBtn glass-capsule px-3 py-1 text-slate-300 text-[11px] hover:text-white hover:border-emerald-400/40 cursor-pointer">30 Min</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Water & Energy Conservation Tracker (ROI & Savings) -->
+    <section class="glass-panel p-4 space-y-3">
+      <div class="flex items-center justify-between">
+        <h3 id="savingsHeadingLabel" class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+          <i data-lucide="badge-dollar-sign" class="w-4 h-4 text-emerald-400"></i> जल व बिजली बचत मीटर (Eco ROI)
+        </h3>
+        <span id="savingsBadge" class="text-[10px] text-emerald-300 bg-emerald-500/20 px-2.5 py-0.5 rounded-full border border-emerald-500/30 font-bold">
+          54% बचत (Saved)
+        </span>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2 text-center">
+        <div class="p-2.5 rounded-2xl bg-slate-900/60 border border-white/5 shadow-inner">
+          <span id="totalWaterDeliveredLabel" class="text-[10px] text-slate-400 block font-hindi">कुल सिंचाई जल</span>
+          <strong id="waterDeliveredVal" class="text-base font-extrabold text-cyan-400 tracking-tight">320 L</strong>
+        </div>
+        <div class="p-2.5 rounded-2xl bg-slate-900/60 border border-white/5 shadow-inner">
+          <span id="waterSavedLabel" class="text-[10px] text-slate-400 block font-hindi">पानी की बचत</span>
+          <strong id="waterSavedVal" class="text-base font-extrabold text-emerald-400 tracking-tight">460 L</strong>
+        </div>
+        <div class="p-2.5 rounded-2xl bg-slate-900/60 border border-white/5 shadow-inner">
+          <span id="powerConsumedLabel" class="text-[10px] text-slate-400 block font-hindi">बिजली खपत</span>
+          <strong id="powerConsumedVal" class="text-base font-extrabold text-amber-300 tracking-tight">0.12 kWh</strong>
+        </div>
+      </div>
+    </section>
+
+    <!-- LIVE TELEMETRY CHART: 24-Hour Historical Moisture & Temperature -->
+    <section class="glass-panel p-4 space-y-3">
+      <div class="flex items-center justify-between">
+        <h3 id="chartHeadingLabel" class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+          <i data-lucide="line-chart" class="w-4 h-4 text-emerald-400"></i> 24-घंटे का नमी व तापमान ग्राफ
+        </h3>
+        <span id="liveChartBadge" class="text-[10px] text-slate-400 font-mono px-2 py-0.5 rounded-full bg-white/5 border border-white/5">Live Stream</span>
+      </div>
+
+      <div class="w-full h-48">
+        <canvas id="telemetryChart"></canvas>
+      </div>
+    </section>
+
+    <!-- Indian Crop Library Trigger Button -->
+    <section>
+      <button id="openCropLibBtn" class="w-full glass-panel p-4 hover:border-emerald-500/50 transition flex items-center justify-between group cursor-pointer">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center group-hover:scale-110 transition shadow-inner">
+            <i data-lucide="book-open" class="w-5 h-5"></i>
+          </div>
+          <div class="text-left font-hindi">
+            <h3 id="cropLibCardTitle" class="text-sm font-bold text-white">भारतीय फसलों का ज्ञानकोष (Crop Encyclopedia)</h3>
+            <p id="cropLibCardSubtitle" class="text-xs text-slate-400">सभी भारतीय फसलों के पानी और सिंचाई का सम्पूर्ण विवरण</p>
+          </div>
+        </div>
+        <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400 group-hover:text-emerald-400 group-hover:translate-x-1 transition"></i>
+      </button>
+    </section>
+
+  </main>
+
+  <!-- MODAL: AI Leaf Disease Scanner / Doctor (Frosted Deep Blur) -->
+  <div id="leafDoctorModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-3xl hidden flex items-center justify-center p-3.5">
+    <div class="glass-panel border-white/15 bg-slate-900/80 max-w-md w-full p-5 space-y-4 shadow-2xl max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-white/10 pb-3">
+        <h3 id="leafModalTitle" class="font-bold text-base text-white flex items-center gap-2">
+          <i data-lucide="scan" class="w-5 h-5 text-emerald-400"></i> एआई पत्ती रोग चिकित्सक (Leaf Doctor)
+        </h3>
+        <button id="closeLeafDoctorBtn" class="glass-capsule p-1.5 text-slate-400 hover:text-white cursor-pointer">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Scanner Preview Box with Glass Reflection -->
+      <div class="relative w-full h-56 rounded-[24px] overflow-hidden bg-slate-950 border border-white/10 flex flex-col items-center justify-center shadow-inner">
+        <img id="leafScanPreviewImg" src="https://images.unsplash.com/photo-1592417817098-8f3d6910985b?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover opacity-80">
+        
+        <!-- Laser Scan Animation -->
+        <div id="scanLaserBar" class="hidden absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_20px_#10b981]"></div>
+        
+        <!-- Scan Prompt -->
+        <div class="absolute bottom-2.5 inset-x-3 p-2 rounded-2xl glass-capsule bg-slate-950/70 text-center text-xs text-slate-200 border-white/10 font-hindi">
+          <span id="scanPromptText">पत्ती की फोटो खींचें या अपलोड करें</span>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex gap-2">
+        <button id="triggerScanActionBtn" class="flex-1 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 transition cursor-pointer">
+          <i data-lucide="camera" class="w-4 h-4 stroke-[2.5]"></i> <span id="startScanBtnText">स्कैन व रोग जांच करें</span>
+        </button>
+      </div>
+
+      <!-- Diagnosis Report (Glass Result Card) -->
+      <div id="diagnosisResultBox" class="p-4 rounded-[22px] bg-slate-950/70 border border-emerald-500/30 space-y-2.5 shadow-inner">
+        <div class="flex items-center justify-between">
+          <div>
+            <span id="diagDiseaseName" class="text-sm font-bold text-red-400 block">पहचान: पीला रतुआ (Yellow Rust)</span>
+            <span id="diagConfidence" class="text-[11px] text-emerald-400 font-medium">सटीकता: 94.6% Confidence</span>
+          </div>
+          <span class="p-2.5 rounded-2xl bg-red-500/15 text-red-400 border border-red-500/25">
+            <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+          </span>
+        </div>
+
+        <div class="border-t border-white/10 pt-2 text-xs space-y-1">
+          <strong id="diagTreatmentTitle" class="text-white block font-semibold">अनुशंसित उपचार (Treatment Prescription):</strong>
+          <p id="diagTreatmentText" class="text-slate-300 font-hindi leading-relaxed text-[11px]">
+            1. <strong>रासायनिक उपचार:</strong> प्रोपिकोनाज़ोल 25% EC (टिल्ट) 1 ml प्रति लीटर पानी में मिलाकर तुरंत छिड़काव करें।<br>
+            2. <strong>जैविक उपाय:</strong> नीम का तेल (1500 PPM) 5 ml प्रति लीटर पानी में मिलाकर रोग की शुरुआत में स्प्रे करें।
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Crop Selection & Sowing Date Modal (Glass) -->
+  <div id="cropConfigModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-3xl hidden flex items-center justify-center p-4">
+    <div class="glass-panel border-white/15 bg-slate-900/80 max-w-md w-full p-5 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-white/10 pb-3">
+        <h3 id="modalSelectCropHeading" class="font-bold text-base text-white flex items-center gap-2">
+          <i data-lucide="calendar" class="w-5 h-5 text-emerald-400"></i> फसल व बुवाई दिनांक चुनें
+        </h3>
+        <button id="closeModalBtn" class="glass-capsule p-1.5 text-slate-400 hover:text-white cursor-pointer">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3 font-hindi">
+        <div>
+          <label id="modalChooseCropLabel" class="text-xs font-semibold text-slate-300 block mb-1">फसल का चयन करें (Select Crop):</label>
+          <select id="cropSelectDropdown" class="w-full bg-slate-900/80 border border-white/15 rounded-2xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-400 shadow-inner">
+          </select>
+        </div>
+
+        <div>
+          <label id="modalSowingDateLabel" class="text-xs font-semibold text-slate-300 block mb-1">बुवाई की तारीख (Sowing Date):</label>
+          <input type="date" id="sowingDateInput" class="w-full bg-slate-900/80 border border-white/15 rounded-2xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-emerald-400 shadow-inner">
+          <p id="modalSowingDateHint" class="text-[11px] text-slate-400 mt-1">तारीख के आधार पर ऐप अपने आप पौधे की अवस्था और पानी की जरूरत तय करेगा।</p>
+        </div>
+
+        <div class="p-3.5 bg-slate-950/60 rounded-2xl border border-white/10 text-xs space-y-1.5 shadow-inner">
+          <span id="modalCropSummaryTitle" class="text-slate-400 block font-medium">चुनी गई फसल का विवरण:</span>
+          <div class="flex justify-between">
+            <span id="modalDurationLabel" class="text-slate-400">कुल अवधि:</span>
+            <strong id="modalCropDuration" class="text-white">-</strong>
+          </div>
+          <div class="flex justify-between">
+            <span id="modalWaterLabel" class="text-slate-400">कुल जल आवश्यकता:</span>
+            <strong id="modalCropWater" class="text-cyan-400">-</strong>
+          </div>
+          <div class="flex justify-between">
+            <span id="modalIrrigLabel" class="text-slate-400">सिंचाई की संख्या:</span>
+            <strong id="modalCropIrrigations" class="text-emerald-400">-</strong>
+          </div>
+        </div>
+
+        <button id="saveCropConfigBtn" class="w-full py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-bold text-sm shadow-lg shadow-emerald-500/25 transition cursor-pointer">
+          सुरक्षित करें (Apply & Save)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Full Indian Crop Encyclopedia Modal (Glass) -->
+  <div id="cropEncyclopediaModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-3xl hidden flex items-center justify-center p-3">
+    <div class="glass-panel border-white/15 bg-slate-900/85 max-w-lg w-full p-5 space-y-4 shadow-2xl h-[92vh] flex flex-col">
+      <div class="flex items-center justify-between border-b border-white/10 pb-3 shrink-0">
+        <div class="flex items-center gap-2">
+          <i data-lucide="book" class="w-5 h-5 text-emerald-400"></i>
+          <h3 id="encyclopediaModalHeading" class="font-bold text-base text-white">भारतीय फसलों की जल-मार्गदर्शिका</h3>
+        </div>
+        <button id="closeEncycBtn" class="glass-capsule p-1.5 text-slate-400 hover:text-white cursor-pointer">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Search & Season Filter Capsules -->
+      <div class="space-y-2 shrink-0">
+        <input type="text" id="cropSearchInput" placeholder="फसल खोजें (जैसे गेहूँ, चना, धान, तरबूज, गन्ना)..." class="w-full bg-slate-900/80 border border-white/15 rounded-2xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-emerald-400 shadow-inner font-hindi">
+        
+        <!-- Season Filter Chips (Android 17 Pills) -->
+        <div class="flex gap-1.5 overflow-x-auto pb-1 text-[11px] no-scrollbar">
+          <button data-season="all" class="seasonFilterBtn glass-capsule px-3 py-1 bg-emerald-500/20 text-emerald-300 border-emerald-400/40 font-semibold cursor-pointer">सभी (All)</button>
+          <button data-season="Rabi" class="seasonFilterBtn glass-capsule px-3 py-1 text-slate-300 hover:text-white cursor-pointer">रबी (Rabi - सर्दी)</button>
+          <button data-season="Kharif" class="seasonFilterBtn glass-capsule px-3 py-1 text-slate-300 hover:text-white cursor-pointer">खरीफ (Kharif - मानसून)</button>
+          <button data-season="Zaid" class="seasonFilterBtn glass-capsule px-3 py-1 text-slate-300 hover:text-white cursor-pointer">जायद (Zaid - गर्मी)</button>
+          <button data-season="Annual" class="seasonFilterBtn glass-capsule px-3 py-1 text-slate-300 hover:text-white cursor-pointer">सालाना (Annual)</button>
+        </div>
+      </div>
+
+      <div id="encyclopediaList" class="flex-1 overflow-y-auto space-y-3 pr-1">
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOATING ANDROID 17 BOTTOM DOCK -->
+  <nav class="fixed bottom-3 inset-x-0 max-w-md mx-auto px-3.5 z-40">
+    <div class="glass-capsule px-4 py-2.5 flex justify-between items-center text-xs bg-slate-900/75 border border-white/15 shadow-2xl backdrop-blur-3xl">
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="text-slate-400">ESP32 IP: <span id="espIpDisplay" class="text-white font-mono font-medium">192.168.4.1</span></span>
+      </div>
+      <button id="simToggleBtn" class="glass-capsule px-3 py-1 bg-white/5 hover:bg-emerald-500/20 text-slate-200 font-semibold border-white/10 text-[11px] flex items-center gap-1.5 cursor-pointer">
+        <i data-lucide="play" class="w-3.5 h-3.5 text-emerald-400"></i> <span id="simBtnLabel">सिम्युलेटर मोड</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- MODAL: Multi-Language Selector Modal (Android 17 Liquid Glass) -->
+  <div id="languageModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-2xl hidden flex items-center justify-center p-4">
+    <div class="glass-panel border-white/20 bg-slate-900/90 max-w-lg w-full p-6 space-y-4 shadow-2xl max-h-[90vh] flex flex-col relative overflow-hidden">
+      <!-- Ambient Glow Orbs -->
+      <div class="absolute -top-16 -right-16 w-36 h-36 bg-emerald-500/20 rounded-full blur-2xl pointer-events-none"></div>
+      <div class="absolute -bottom-16 -left-16 w-36 h-36 bg-cyan-500/20 rounded-full blur-2xl pointer-events-none"></div>
+
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between border-b border-white/10 pb-3 relative z-10">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400 shadow-md">
+            <i data-lucide="globe" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 id="selectLangTitle" class="font-bold text-base text-white">अपनी भाषा चुनें / Select Language</h3>
+            <p id="selectLangSub" class="text-[11px] text-slate-400">9 प्रमुख भारतीय कृषि भाषाओं में उपलब्ध</p>
+          </div>
+        </div>
+        <button id="closeLangModalBtn" class="glass-capsule p-1.5 hover:bg-white/10 text-slate-400 hover:text-white cursor-pointer transition-all">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Language Cards Grid -->
+      <div id="languageGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 overflow-y-auto pr-1 py-1 max-h-[55vh] custom-scrollbar relative z-10">
+        <!-- Dynamically populated via renderLanguageCards() in app.js -->
+      </div>
+
+      <!-- Footer Voice Notice -->
+      <div class="pt-3 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-400 relative z-10">
+        <div class="flex items-center gap-1.5 text-emerald-400 font-medium">
+          <i data-lucide="volume-2" class="w-3.5 h-3.5 animate-pulse"></i>
+          <span id="voiceNoticeText">किसान-वाणी (Voice Alerts) स्वतः चुनी गई भाषा में बोले जाएंगे।</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="translations.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

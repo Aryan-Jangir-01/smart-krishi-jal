@@ -10,6 +10,5 @@ node_modules/
 *_backup.js
 
 # IDE / Editor Files
-.vscode/
 .idea/
 *.swp

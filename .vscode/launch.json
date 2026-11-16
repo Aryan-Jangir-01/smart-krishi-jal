@@ -1,0 +1,12 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run Smart Krishi-Jal (Edge / Chrome)",
+      "type": "msedge",
+      "request": "launch",
+      "url": "http://localhost:8080/index.html",
+      "webRoot": "${workspaceFolder}/app"
+    }
+  ]
+}

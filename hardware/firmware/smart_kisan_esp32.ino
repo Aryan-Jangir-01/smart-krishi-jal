@@ -25,6 +25,15 @@
 #include <DHT.h>
 #include <Preferences.h>
 #include <ESPmDNS.h>
+#include <HTTPClient.h>
+#include <WiFiClientSecure.h>
+
+// --------------------------- SUPABASE CLOUD CONFIG ---------------------
+const char* SUPABASE_HOST = "https://putzumkxfhsmxagozsvj.supabase.co";
+const char* SUPABASE_KEY  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB1dHp1bWt4ZmhzbXhhZ296c3ZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3NzI2NzksImV4cCI6MjEwMDM0ODY3OX0.JNUn9z1ZxLEKg4q_-SH2VjoDzzJs7VJ_AY9NyENwNAM";
+
+unsigned long lastSupabaseSyncTime = 0;
+const unsigned long SUPABASE_SYNC_INTERVAL = 10000; // Poll Supabase every 10s
 
 // --------------------------- PIN DEFINITIONS ---------------------------
 #define SOIL_PIN        34   // ADC1_CH6 (Capacitive Moisture Sensor)
@@ -294,6 +303,71 @@ void handlePostControl() {
   handleGetStatus();
 }
 
+// --------------------------- SUPABASE CLOUD SYNC ------------------------
+void syncWithSupabase() {
+  if (WiFi.status() != WL_CONNECTED) return;
+
+  WiFiClientSecure client;
+  client.setInsecure(); // SSL certificate bypass for IoT devices
+
+  HTTPClient https;
+  // 1. Fetch remote commands (e.g. from farmer's mobile app via Supabase)
+  String getUrl = String(SUPABASE_HOST) + "/rest/v1/motor_controls?id=eq.1&select=motor_command,mode";
+
+  if (https.begin(client, getUrl)) {
+    https.addHeader("apikey", SUPABASE_KEY);
+    https.addHeader("Authorization", String("Bearer ") + SUPABASE_KEY);
+    https.addHeader("Content-Type", "application/json");
+
+    int httpCode = https.GET();
+    if (httpCode == HTTP_CODE_OK) {
+      String payload = https.getString();
+      StaticJsonDocument<256> doc;
+      DeserializationError err = deserializeJson(doc, payload);
+      if (!err && doc.size() > 0) {
+        const char* cmd = doc[0]["motor_command"];
+        const char* mode = doc[0]["mode"];
+
+        if (mode && strcmp(mode, "MANUAL") == 0) {
+          state.autoMode = false;
+        } else if (mode && strcmp(mode, "AUTO") == 0) {
+          state.autoMode = true;
+        }
+
+        if (cmd && strcmp(cmd, "ON") == 0 && !state.motorRunning && !state.dryRunAlarm) {
+          setMotor(true, "Cloud Remote (Supabase)");
+        } else if (cmd && strcmp(cmd, "OFF") == 0 && state.motorRunning) {
+          setMotor(false, "Cloud Remote (Supabase)");
+        }
+      }
+    }
+    https.end();
+  }
+
+  // 2. Push telemetry to sensor_telemetry table
+  String postUrl = String(SUPABASE_HOST) + "/rest/v1/sensor_telemetry";
+  if (https.begin(client, postUrl)) {
+    https.addHeader("apikey", SUPABASE_KEY);
+    https.addHeader("Authorization", String("Bearer ") + SUPABASE_KEY);
+    https.addHeader("Content-Type", "application/json");
+    https.addHeader("Prefer", "return=minimal");
+
+    StaticJsonDocument<256> telemetryDoc;
+    telemetryDoc["moisture_pct"] = state.soilMoisturePct;
+    telemetryDoc["temperature_c"] = state.temperatureC;
+    telemetryDoc["humidity_pct"] = state.humidityPct;
+    telemetryDoc["flow_rate_lpm"] = state.flowRateLpm;
+    telemetryDoc["total_water_litres"] = state.totalLiters;
+    telemetryDoc["motor_state"] = state.motorRunning;
+    telemetryDoc["grid_power"] = state.gridPowerAvailable;
+
+    String jsonString;
+    serializeJson(telemetryDoc, jsonString);
+    https.POST(jsonString);
+    https.end();
+  }
+}
+
 // --------------------------- SETUP & LOOP -------------------------------
 
 void setup() {
@@ -402,5 +476,11 @@ void loop() {
     lastSensorReadTime = currentMillis;
     readEnvironmentalSensors();
     checkAutonomousIrrigation();
+  }
+
+  // Periodic Supabase Cloud Sync
+  if (currentMillis - lastSupabaseSyncTime >= SUPABASE_SYNC_INTERVAL) {
+    lastSupabaseSyncTime = currentMillis;
+    syncWithSupabase();
   }
 }

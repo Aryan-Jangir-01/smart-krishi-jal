@@ -1064,6 +1064,132 @@ function getSeasonDisplayName(seasonKey, lang) {
   return seasonKey;
 }
 
+// ============================================================================
+// SECTION 2.5: SUPABASE CLOUD BACKEND INTEGRATION
+// ============================================================================
+const SUPABASE_CONFIG = {
+  url: "https://putzumkxfhsmxagozsvj.supabase.co",
+  anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB1dHp1bWt4ZmhzbXhhZ296c3ZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3NzI2NzksImV4cCI6MjEwMDM0ODY3OX0.JNUn9z1ZxLEKg4q_-SH2VjoDzzJs7VJ_AY9NyENwNAM"
+};
+
+let supabaseClient = null;
+let isCloudConnected = false;
+
+function initSupabase() {
+  if (typeof supabase !== 'undefined' && supabase.createClient) {
+    try {
+      supabaseClient = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+      isCloudConnected = true;
+      console.log("☁️ Supabase Cloud Initialized:", SUPABASE_CONFIG.url);
+      updateCloudSyncBadge(true);
+      
+      // Subscribe to real-time remote commands
+      subscribeToRemoteControls();
+
+      // Fetch recent cloud telemetry
+      fetchRecentCloudTelemetry();
+    } catch (err) {
+      console.warn("Supabase initialization error:", err);
+      updateCloudSyncBadge(false);
+    }
+  } else {
+    console.warn("Supabase SDK not loaded yet.");
+    updateCloudSyncBadge(false);
+  }
+}
+
+function updateCloudSyncBadge(connected) {
+  const pill = document.getElementById('cloudSyncPill');
+  const text = document.getElementById('cloudSyncText');
+  if (!pill) return;
+  if (connected) {
+    pill.className = "glass-capsule flex items-center gap-1 px-2.5 py-1 text-[11px] text-cyan-300 bg-cyan-500/15 border border-cyan-400/30";
+    if (text) text.textContent = "क्लाउड लाइव";
+  } else {
+    pill.className = "glass-capsule flex items-center gap-1 px-2.5 py-1 text-[11px] text-slate-400 bg-white/5 border border-white/10";
+    if (text) text.textContent = "ऑफ़लाइन";
+  }
+}
+
+function subscribeToRemoteControls() {
+  if (!supabaseClient) return;
+  try {
+    supabaseClient
+      .channel('public:motor_controls')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'motor_controls' }, (payload) => {
+        if (payload.new) {
+          console.log('📡 Realtime Cloud Motor Command Received:', payload.new);
+          const cmd = payload.new.motor_command;
+          if (cmd === 'ON' && !appState.motorRunning) {
+            appState.motorRunning = true;
+            updateUI();
+          } else if (cmd === 'OFF' && appState.motorRunning) {
+            appState.motorRunning = false;
+            updateUI();
+          }
+        }
+      })
+      .subscribe();
+  } catch (err) {
+    console.warn("Realtime subscription warning:", err);
+  }
+}
+
+async function syncMotorStateToCloud(isRunning, mode) {
+  if (!supabaseClient) return;
+  try {
+    await supabaseClient
+      .from('motor_controls')
+      .upsert({
+        id: 1,
+        motor_command: isRunning ? 'ON' : 'OFF',
+        mode: mode || (appState.autoMode ? 'AUTO' : 'MANUAL'),
+        updated_at: new Date().toISOString()
+      });
+  } catch (err) {
+    console.warn("Failed syncing motor command to cloud:", err);
+  }
+}
+
+let lastCloudPushTimestamp = 0;
+async function pushTelemetryToCloud() {
+  if (!supabaseClient) return;
+  const now = Date.now();
+  if (now - lastCloudPushTimestamp < 15000) return; // Push every 15s
+  lastCloudPushTimestamp = now;
+
+  try {
+    await supabaseClient.from('sensor_telemetry').insert([{
+      moisture_pct: Math.round(appState.soilMoisture * 10) / 10,
+      temperature_c: Math.round(appState.temperature * 10) / 10,
+      humidity_pct: Math.round(appState.humidity * 10) / 10,
+      flow_rate_lpm: Math.round(appState.flowRate * 10) / 10,
+      total_water_litres: Math.round(appState.totalLitersDelivered || 0),
+      motor_state: appState.motorRunning,
+      grid_power: appState.gridPowerAvailable,
+      crop_id: appState.selectedCropId
+    }]);
+  } catch (err) {
+    // Non-blocking background telemetry sync
+  }
+}
+
+async function fetchRecentCloudTelemetry() {
+  if (!supabaseClient) return;
+  try {
+    const { data, error } = await supabaseClient
+      .from('sensor_telemetry')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(10);
+    
+    if (data && data.length > 0) {
+      console.log(`Loaded ${data.length} telemetry points from Supabase Cloud.`);
+    }
+  } catch (err) {}
+}
+
+
 // --- Application State ---
 let appState = {
   currentLang: "hi",
@@ -2007,9 +2133,13 @@ function tickSystem() {
         updateUI();
       });
   }
+  pushTelemetryToCloud();
 }
 
 function sendHardwareCommand(payload) {
+  if (payload.motor !== undefined) {
+    syncMotorStateToCloud(payload.motor, payload.auto_mode);
+  }
   const t = TRANSLATIONS[appState.currentLang];
   if (appState.isSimulator) {
     if (payload.auto_mode !== undefined) appState.autoMode = payload.auto_mode;
@@ -2335,6 +2465,7 @@ function initApp() {
   setLanguage(savedLang);
   initDigitalTwin();
   initTelemetryChart();
+  initSupabase();
 
   setInterval(tickSystem, 2500);
   setupEventListeners();
